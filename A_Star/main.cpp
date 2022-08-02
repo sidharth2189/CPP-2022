@@ -6,7 +6,7 @@
 #include <algorithm>
 
 // Board cell state
-enum class State {kEmpty, kObstacle, kClosed, kPath};
+enum class State {kStart, kEmpty, kObstacle, kClosed, kPath, kFinish};
 
 // Directional deltas (motion model)
 const int delta[4][2]{{-1, 0}, {0, -1}, {1, 0}, {0, 1}};
@@ -141,7 +141,14 @@ std::vector<std::vector<State>> Search(std::vector<std::vector<State>> grid, int
     grid[x][y] = State::kPath;
 
     // Check if the goal is reached. If so, return grid.
-    if (x == goal[0] && y == goal[1]) {return grid;}
+    if (x == goal[0] && y == goal[1])
+    {
+      // Set the init grid cell to kStart, and 
+      // set the goal grid cell to kFinish before returning the grid.
+      grid[init[0]][init[1]] = State::kStart;
+      grid[goal[0]][goal[1]] = State::kFinish;
+      return grid;
+    }
 
     // If not, expand search to current node's neighbour
     ExpandNeighbors(current_node, goal, open, grid);
@@ -159,8 +166,10 @@ std::string CellString(State cell)
   {
     case State::kObstacle: return "Obs   ";
     case State::kPath: return "Car   ";
-    default: return "000   "; 
-  }
+    case State::kStart: return "Str   ";
+    case State::kFinish: return "Fin  ";
+    default: return "000   ";  
+  } 
 }
 
 // Print board
